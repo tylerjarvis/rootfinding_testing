@@ -1,0 +1,66 @@
+Number of variables: 2
+Variables:  x0 x1
+Rank: 2
+-------------------------
+Solution 0 (path number 0)
+Estimated condition number: 3.987982822012322e+02
+Function residual: 4.357157503803983e-17
+Latest Newton residual: 1.708581637846771e-16
+T value at final sample point: 6.103515625000000e-06
+Maximum precision utilized: 52
+T value of first precision increase: 0.000000000000000e+00
+Accuracy estimate, internal coordinates (difference of last two endpoint estimates):  1.199476652738481e-13
+Accuracy estimate, user's coordinates (after dehomogenization, if applicable):  1.608124800593251e-13
+Cycle number: 1
+-5.008372797781063e-01 6.938893903907228e-17
+2.393782216838063e-03 -4.336808689942018e-19
+Paths with the same endpoint, to the prescribed tolerance:  
+Multiplicity: 1
+-------------------------
+Solution 1 (path number 3)
+Estimated condition number: 5.038440037188346e+16
+Function residual: 3.152565840932039e-14
+Latest Newton residual: 3.408652088468370e-16
+T value at final sample point: 3.814697265625000e-07
+Maximum precision utilized: 52
+T value of first precision increase: 0.000000000000000e+00
+Accuracy estimate, internal coordinates (difference of last two endpoint estimates):  9.019408735944534e-12
+Accuracy estimate, user's coordinates (after dehomogenization, if applicable):  4.780489723724737e-12
+Cycle number: 2
+-2.591942024497262e-14 4.311334147085849e-14
+2.963671894030523e-16 -3.597718889122393e-16
+Paths with the same endpoint, to the prescribed tolerance:  1  
+Multiplicity: 2
+-------------------------
+At tol=1.000000000000e-10, there appear to be 2 solutions.
+
+
+*************** input file needed to reproduce this run ***************
+
+CONFIG
+
+CoeffBound: 3.730532000000e+01;
+DegreeBound: 2.000000000000e+00;
+SecurityMaxNorm: 1.000000000000e+00;
+RandomSeed: 1764106938;
+
+END;
+
+INPUT
+
+function f0,f1;
+variable_group x0,x1;
+f0=-0.028554130555317032*x0^2*x1^0+12.0*x0^0*x1^1+18.0*x0^1*x1^1+3.0*x0^0*x1^2;
+f1=-0.12890441971914582*x0^2*x1^0+19.0*x0^0*x1^1+11.0*x0^1*x1^1+7.0*x0^0*x1^2;
+
+END;
+
+
+*************** version information ***************
+Bertini(TM) v1.7.0
+GMP v6.0.0, MPFR v3.1.2
+
+Authors:
+D.J. Bates, J.D. Hauenstein,
+A.J. Sommese, C.W. Wampler
+
