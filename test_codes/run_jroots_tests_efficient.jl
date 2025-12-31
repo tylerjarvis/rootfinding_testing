@@ -3,7 +3,7 @@ using NPZ
 using DelimitedFiles
 using Statistics
 
-dim = 8
+dim = 20
 degs = 2:5
 nonzero = 3
 numtests = 100
@@ -59,10 +59,15 @@ for deg in degs
     A = []
     
     # Minimize compilation time error by running a few tests without times
-    for i in 1:10
+    println("Starting warmup test")
+    flush(stdout)
+    for i in 1:2
         f = [MultiPower(to_python(create_coeff_matrix(coeffs, dim, deg, i, j))) for j in 1:dim];
         solve(f,-ones(dim),ones(dim))
     end
+
+    println("Starting tests")
+    flush(stdout)
 
     for i in 1:reps
         if i%10 == 0

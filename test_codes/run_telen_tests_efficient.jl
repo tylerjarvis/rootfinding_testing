@@ -9,10 +9,10 @@ using Combinatorics  # for product()
 
 # ------------------ user-config ------------------
 dim      = 2
-degs     = 2:10          # keep your editable degrees list here
+degs     = 2:30          # keep your editable degrees list here
 nonzero  = 3            # matches num{nonzero}.npy
 numTests = 100
-tol      = 1.0e-14      # imag-part tolerance
+tol      = 1.0e-13      # imag-part tolerance
 
 @polyvar x[1:dim]
 
@@ -95,8 +95,8 @@ for deg in degs
         # CHECK THIS
         f = [vec(create_coeff_matrix(coeffs, dim, deg, i, j))' * vec(basis) for j in 1:dim]
 
-        ans = @timed EigenvalueSolver.solve_CI_dense(f, x)
-        A   = ans.value
+        ans = @timed EigenvalueSolver.solve_CI_mixed(f, x)
+        A   = ans.value[1]
         timer_sum += ans.time
 
         # (a) nearly real (same strict tolerance check)

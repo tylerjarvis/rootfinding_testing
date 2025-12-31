@@ -1,9 +1,19 @@
 CONFIG
-SECURITYMAXNORM: 1;
+MPTYPE: 0;
+SECURITYLEVEL: 1;
+SECURITYMAXNORM: 1e12;
+MINSTEPSIZEBEFOREEG: 1e-11;
+MINSTEPSIZEDURINGEG: 1e-11;
 END;
 INPUT
-function f0, f1;
-variable_group x0, x1;
-f0 = -0.028554130555317032*x0^0*x1^0 + -0.9976423886741775*x0^12*x1^18 + -0.04546930564284687*x0^3*x1^3 + -0.344007579271025*x0^9*x1^5;
-f1 = -0.12890441971914582*x0^0*x1^0 + 0.5796637158028783*x0^19*x1^11 + -0.6236341462481731*x0^7*x1^13 + 0.7764578862965476*x0^2*x1^1;
+variable_group px,py,z;
+function f1, f2, f3;
+
+f1 = -(px^2)-py^2+z^2*px^2*py^2;
+
+f2 = -(2700)+2700*px+8100*z^2*px^2-5400*z^2*px^3
+     +51*z^3*px^6-2*z^3*px^7;
+
+f3 = -(2700)+2700*py+8100*z^2*py^2-5400*z^2*py^3
+     +51*z^3*py^6-2*z^3*py^7;
 END;

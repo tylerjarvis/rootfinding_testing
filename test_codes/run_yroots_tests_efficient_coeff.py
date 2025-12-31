@@ -56,14 +56,18 @@ def run_test(dim, deg, nonzero, num, roots_only=True):
 
 
 if __name__ == "__main__":
-    dim = 8
+    dim = 2
     mindeg = 2
-    maxdeg = 5
+    maxdeg = 10
     nonzero = 3
     num_tests = 100
 
     # Warm-up (JIT, caches, etc.)
     run_test(dim, 2, nonzero, 1)
+    
+    # Warm-up all of degree 2 (these results in lower averge time for deg 2)
+    # for i in range(num_tests):
+    #     run_test(dim, 2, nonzero, i)
 
     # Base output directories
     base_dir = f"../sparse/results/yroots_results/dim{dim}/nonzero{nonzero}"

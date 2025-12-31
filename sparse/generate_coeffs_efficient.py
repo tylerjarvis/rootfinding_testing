@@ -73,9 +73,9 @@ def full_coeff_matrix(dim, deg, coeff_info):
     return coeff_matrix
 
 if __name__ == "__main__":
-    dim = 8
-    mindeg = 6
-    maxdeg = 10
+    dim = 40
+    mindeg = 2
+    maxdeg = 2
     nonzero = 3
     num_tests = 100
     rng = np.random.default_rng(seed=42)

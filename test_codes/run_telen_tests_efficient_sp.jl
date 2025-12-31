@@ -9,9 +9,9 @@ using Combinatorics  # for product()
 
 # ------------------ user-config ------------------
 dim      = 2
-degs     = 2:10          # keep your editable degrees list here
+degs     = 30:30          # keep your editable degrees list here
 nonzero  = 3            # matches num{nonzero}.npy
-numTests = 100
+numTests = 10
 tol      = 1.0e-14      # imag-part tolerance
 
 @polyvar x[1:dim]
