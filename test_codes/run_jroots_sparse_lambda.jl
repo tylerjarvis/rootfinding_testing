@@ -2,9 +2,10 @@ include("../../hyun/Julia-Rootfinding/src/CombinedSolver.jl")
 using NPZ
 using DelimitedFiles
 using Statistics
+using JSON3
 
-dim = 6
-degs = 2:15
+dim = 4
+degs = 2:30
 nonzero = 3
 numtests = 100
 
@@ -53,10 +54,42 @@ function poly_from_terms(coeff_data, dim::Int, test_num, func_num)
     end
 end
 
+function write_to_json(output_file, data)
+    open(output_file, "w") do f
+        write(f, "{\n")
+
+        items = sort(collect(data), by = x -> parse(Int, x[1]))
+        for (i, (test_num, roots)) in enumerate(items)
+            write(f, "  \"$test_num\": ")
+
+            if isempty(roots)
+                write(f, "[]")
+            else
+                write(f, "[\n")
+                for (j, root) in enumerate(roots)
+                    write(f, "    " * JSON3.write(root))
+                    if j < length(roots)
+                        write(f, ",")
+                    end
+                    write(f, "\n")
+                end
+                write(f, "  ]")
+            end
+
+            if i < length(items)
+                write(f, ",")
+            end
+            write(f, "\n")
+        end
+
+        write(f, "}\n")
+    end
+end
+
 dir = "../sparse/results/jroots_lambda_results/dim$(dim)/nonzero$(nonzero)"
 mkpath(dir)  # creates nested directories if missing
 
-files = ["avg_times.txt", "avg_resids.txt", "max_resids.txt", "sum_resids"]
+files = ["avg_times.txt", "avg_resids.txt", "max_resids.txt", "sum_resids.txt"]
 
 for file in files
     filepath = joinpath(dir, file)
@@ -64,20 +97,21 @@ for file in files
 end
 
 for deg in degs
-    new_dir = joinpath(dir, "deg$(deg)")
-    mkpath(new_dir)
-
     times_file = open("$dir/avg_times.txt","a")
     avg_resids_file = open("$dir/avg_resids.txt","a")
     max_resids_file = open("$dir/max_resids.txt","a")
     sum_resids_file = open("$dir/sum_resids.txt","a")
-    roots_test_file = open("$new_dir/roots_test.txt","w")
+
+    new_dir = joinpath(dir, "roots")
+    mkpath(new_dir)
+    roots_test_file = "$new_dir/roots_deg$(deg).json"
     
     all_res = []
     timer = 0;
     coeffs = npzread("../sparse/coeffs/dim$(dim)/deg$(deg)/num$(nonzero).npy")
     reps = min(size(coeffs)[1], numtests); # should be 100
     A = []
+    roots = Dict()
     
     # Minimize compilation time error by running a few tests without times
     println("Starting warmup test")
@@ -107,16 +141,23 @@ for deg in degs
             end
         end
         
-        write(roots_test_file, "Test $(i)\n")
-        writedlm(roots_test_file, A)
-        write(roots_test_file, "\n")
+        roots[string(i)] = A
 
     end
+
+    write_to_json(roots_test_file, roots)
     
     timings = timer/reps
-    avg_res = mean(all_res)
-    max_res = maximum(all_res)
-    sum_res = sum(all_res)
+
+    if isempty(all_res)
+        avg_res = NaN
+        max_res = NaN
+        sum_res = NaN
+    else
+        avg_res = mean(all_res)
+        max_res = maximum(all_res)
+        sum_res = sum(all_res)
+    end
 
     write(times_file,string(timings) * "\n")
     write(avg_resids_file,string(avg_res) * "\n")
@@ -127,8 +168,6 @@ for deg in degs
     close(avg_resids_file)
     close(max_resids_file)
     close(sum_resids_file)
-
-    close(roots_test_file)    
 end
 
 print("Program finished!")

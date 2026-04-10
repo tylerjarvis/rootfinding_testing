@@ -6,6 +6,8 @@ using Statistics
 using EigenvalueSolver
 using Printf
 using Combinatorics  # for product()
+using LinearAlgebra: BLAS
+
 
 # ------------------ user-config ------------------
 dim      = 6
@@ -13,8 +15,11 @@ degs     = 2:7          # keep your editable degrees list here
 nonzero  = 3            # matches num{nonzero}.npy
 numTests = 100
 tol      = 1.0e-13      # imag-part tolerance
+max_cpus = 40
 @polyvar x[1:dim]
 
+# Controls number of cpus used
+BLAS.set_num_threads(max_cpus)
 # ------------------ output layout (telen_results) ------------------
 base_dir = "../sparse/results/telen_results/dim$(dim)/nonzero$(nonzero)"
 isdir(base_dir) || mkpath(base_dir)
@@ -168,8 +173,9 @@ for deg in degs
 
             #writedlm(joinpath(out_dir, "roots_test$(i).txt"), roots_mat)
         catch e
-            push!(bad_tests, i)
+            write(roots_test_file, "Test $(i)\n")
             println("Test $i failed: ", e)
+            write(roots_test_file, "\n")
             continue
         end
     end
@@ -177,9 +183,16 @@ for deg in degs
     # --- summaries computed exactly like your original ---
     # (no special-casing / no NaN/zero fallbacks)
     avg_time  = timer_sum / (reps - length(bad_tests))
-    avg_res   = mean(all_res)
-    max_res   = maximum(all_res)
-    sum_res   = sum(all_res)
+
+    if lisempty(all_res)
+        avg_res = NaN
+        max_res = NaN
+        sum_res = NaN
+    else
+        avg_res = mean(all_res)
+        max_res = maximum(all_res)
+        sum_res = sum(all_res)
+    end
 
     append_value(avg_time_path,  avg_time)
     append_value(max_resid_path, max_res)

@@ -3,6 +3,7 @@ import yroots as yr
 import numpy as np
 from time import time
 import os
+import json
 
 
 def residuals(dim, funcs, roots):
@@ -53,12 +54,38 @@ def run_test(dim, deg, nonzero, num, roots_only=True):
         roots = yr.solve(funcs, a, b)
         t = time() - start
         return residuals(dim, funcs, roots), roots, t
+    
+# Writes roots to a JSON file
+def write_to_json(output_file, data):
+    with open(output_file, "w") as f:
+        f.write("{\n")
+        
+        items = list(data.items())
+        for i, (test_num, roots) in enumerate(items):
+            f.write(f'  "{test_num}": ')
+            
+            if len(roots) == 0:
+                f.write("[]")
+            else:
+                f.write("[\n")
+                for j, root in enumerate(roots):
+                    f.write("    " + json.dumps(root.tolist()))
+                    if j < len(roots) - 1:
+                        f.write(",")
+                    f.write("\n")
+                f.write("  ]")
+            
+            if i < len(items) - 1:
+                f.write(",")
+            f.write("\n")
+        
+        f.write("}\n")
 
 
 if __name__ == "__main__":
-    dim = 8
+    dim = 6
     mindeg = 2
-    maxdeg = 5
+    maxdeg = 10
     nonzero = 3
     num_tests = 100
 
@@ -92,15 +119,14 @@ if __name__ == "__main__":
     for deg in range(mindeg, maxdeg + 1):
         print(f"--- Dim {dim} Degree {deg}/{maxdeg} ---")
 
-        # Per-degree folder for roots
-        out_dir = os.path.join(base_dir, f"deg{deg}")
-        os.makedirs(out_dir, exist_ok=True)
-
-        roots_test_path = os.path.join(out_dir, "roots_tests.txt")
-        roots_file = open(roots_test_path, "w") # Change to 'a' when adding number of tests
+        # Put all root files in one folder
+        roots_dir = os.path.join(base_dir, "roots")
+        os.makedirs(roots_dir, exist_ok=True)
+        roots_file = os.path.join(roots_dir, f"roots_deg{deg}.json")
 
         all_times = []
         all_res   = []
+        root_dic = {}
 
         for test in range(num_tests):
             if (test + 1) % 10 == 0:
@@ -111,12 +137,9 @@ if __name__ == "__main__":
             all_res.extend(np.array(res).flatten())
 
             # Save roots per test into the per-degree folder
-            # np.save(os.path.join(out_dir, f"roots_test{test + 1}.npy"), roots)
-            roots_file.write(f"Test {test + 1}\n")
-            np.savetxt(roots_file, roots, fmt="%.17g") 
-            roots_file.write("\n")
+            root_dic[str(test + 1)] = roots
 
-        roots_file.close()
+        write_to_json(roots_file, root_dic)
 
         # Compute summaries for this degree
         arr = np.array(all_res)
