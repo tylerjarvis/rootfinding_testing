@@ -10,8 +10,8 @@ using LinearAlgebra: BLAS
 
 
 # ------------------ user-config ------------------
-dim      = 6
-degs     = 2:7          # keep your editable degrees list here
+dim      = 7
+degs     = 2:4          # keep your editable degrees list here
 nonzero  = 3            # matches num{nonzero}.npy
 numTests = 100
 tol      = 1.0e-13      # imag-part tolerance
@@ -95,8 +95,8 @@ for deg in degs
     for i in 1:reps
         if (i % 10) == 0
             println("  test $(i)/$(reps)")
-            flush(stdout)
         end
+        flush(stdout)
 
         # Build polynomials exactly as before
         # CHECK THIS
@@ -174,8 +174,9 @@ for deg in degs
             #writedlm(joinpath(out_dir, "roots_test$(i).txt"), roots_mat)
         catch e
             write(roots_test_file, "Test $(i)\n")
-            println("Test $i failed: ", e)
+            write(roots_test_file, "Test $i failed: $(e)")
             write(roots_test_file, "\n")
+            push!(bad_tests, i)
             continue
         end
     end
@@ -184,7 +185,7 @@ for deg in degs
     # (no special-casing / no NaN/zero fallbacks)
     avg_time  = timer_sum / (reps - length(bad_tests))
 
-    if lisempty(all_res)
+    if isempty(all_res)
         avg_res = NaN
         max_res = NaN
         sum_res = NaN

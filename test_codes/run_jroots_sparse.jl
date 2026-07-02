@@ -1,10 +1,10 @@
-include("../../hyun/Julia-Rootfinding/src/CombinedSolver.jl")
+include("../../hyun/Julia-optimize/src/CombinedSolver.jl")
 using NPZ
 using DelimitedFiles
 using Statistics
 using JSON3
 
-dim = 4
+dim = 3
 degs = 2:30
 nonzero = 3
 numtests = 100
@@ -32,6 +32,17 @@ function create_coeff_matrix(coeff_data, dim, deg, test_num, func_num)
 
     return coeff_matrix
 end
+
+function multipower_from_terms(terms::Matrix, dim::Int)::MultiPower
+    max_exp = Int.(maximum(terms[:, 1:dim], dims=1)) .+ 1
+    coeff = zeros(Tuple(max_exp)...)
+    for row in eachrow(terms)
+        idx = CartesianIndex(Tuple(Int.(row[1:dim]) .+ 1))
+        coeff[idx] = Float64(row[dim+1])
+    end
+    return MultiPower(coeff)
+end
+
 
 # Writes roots to a JSON file
 function write_to_json(output_file, data)
@@ -66,7 +77,7 @@ function write_to_json(output_file, data)
     end
 end
 
-dir = "../sparse/results/jroots_results/dim$(dim)/nonzero$(nonzero)"
+dir = "../sparse/results/jroots_results2/dim$(dim)/nonzero$(nonzero)"
 mkpath(dir)  # creates nested directories if missing
 
 files = ["avg_times.txt", "avg_resids.txt", "max_resids.txt", "sum_resids.txt"]
@@ -97,7 +108,7 @@ for deg in degs
     println("Starting warmup test")
     flush(stdout)
     for i in 1:10
-        f = [MultiPower(to_python(create_coeff_matrix(coeffs, dim, deg, i, j))) for j in 1:dim];
+        f = [multipower_from_terms(coeffs[i, j, :, :], dim) for j in 1:dim]
         solve(f,-ones(dim),ones(dim))
     end
 
