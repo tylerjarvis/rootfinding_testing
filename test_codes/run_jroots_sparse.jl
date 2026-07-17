@@ -4,8 +4,8 @@ using DelimitedFiles
 using Statistics
 using JSON3
 
-dim = 3
-degs = 2:30
+dim = 8
+degs = 2:10
 nonzero = 3
 numtests = 100
 
